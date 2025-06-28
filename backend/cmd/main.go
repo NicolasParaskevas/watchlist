@@ -8,7 +8,9 @@ import (
 
 func main() {
 
-	server := app.NewServer()
+	hub := app.NewHub()
+	server := app.NewServer(hub)
+
 	if err := server.Start(":8080"); err != nil {
 		log.Fatalf("Server error: %v", err)
 	}
