@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 )
@@ -55,5 +56,18 @@ func (s *Server) handleUnsubscribe(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleAllSymbols(rw http.ResponseWriter, r *http.Request) {
-	// todo
+	symbols, err := GetAllSymbols()
+	if err != nil {
+		http.Error(rw, "Failed to load symbols", http.StatusInternalServerError)
+		return
+	}
+
+	writeJSON(rw, symbols)
+}
+
+func writeJSON(rw http.ResponseWriter, v any) {
+	rw.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(rw).Encode(v); err != nil {
+		http.Error(rw, "Failed to encode response", http.StatusInternalServerError)
+	}
 }

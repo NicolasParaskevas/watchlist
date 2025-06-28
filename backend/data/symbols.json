@@ -1,0 +1,17 @@
+[
+  { "symbol": "AAPL", "type": "Stock", "name": "Apple Inc." },
+  { "symbol": "MSFT", "type": "Stock", "name": "Microsoft Corporation" },
+  { "symbol": "GOOGL", "type": "Stock", "name": "Alphabet Inc. (Class A)" },
+  { "symbol": "AMZN", "type": "Stock", "name": "Amazon.com Inc." },
+  { "symbol": "TSLA", "type": "Stock", "name": "Tesla Inc." },
+  { "symbol": "BTC-USD", "type": "Crypto", "name": "Bitcoin" },
+  { "symbol": "ETH-USD", "type": "Crypto", "name": "Ethereum" },
+  { "symbol": "XRP-USD", "type": "Crypto", "name": "Ripple" },
+  { "symbol": "LTC-USD", "type": "Crypto", "name": "Litecoin" },
+  { "symbol": "DOGE-USD", "type": "Crypto", "name": "Dogecoin" },
+  { "symbol": "NFLX", "type": "Stock", "name": "Netflix Inc." },
+  { "symbol": "NVDA", "type": "Stock", "name": "NVIDIA Corporation" },
+  { "symbol": "BABA", "type": "Stock", "name": "Alibaba Group Holding Ltd." },
+  { "symbol": "ADA-USD", "type": "Crypto", "name": "Cardano" },
+  { "symbol": "SOL-USD", "type": "Crypto", "name": "Solana" }
+]
