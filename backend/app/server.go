@@ -32,6 +32,7 @@ func NewServer(hub *Hub) *Server {
 }
 
 func (s *Server) Start(addr string) error {
+	go s.Hub.Run()
 	go GetPriceData(s.Hub.BroadcastChan)
 	log.Println("Server starting at", addr)
 	return http.ListenAndServe(addr, s.mux)
