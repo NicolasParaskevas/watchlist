@@ -47,12 +47,18 @@ func (h *Hub) Run() {
 
 		case sub := <-h.Subscribe:
 			h.Mutex.Lock()
-			sub.Client.Subscribe(sub.Symbol)
+			client, ok := h.Clients[sub.ClientId]
+			if ok {
+				client.Subscribe(sub.Symbol)
+			}
 			h.Mutex.Unlock()
 
 		case unsub := <-h.Unsubscribe:
 			h.Mutex.Lock()
-			unsub.Client.Unsubscribe(unsub.Symbol)
+			client, ok := h.Clients[unsub.ClientId]
+			if ok {
+				client.Unsubscribe(unsub.Symbol)
+			}
 			h.Mutex.Unlock()
 
 		case update := <-h.BroadcastChan:

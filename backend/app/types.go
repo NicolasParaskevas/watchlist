@@ -8,11 +8,11 @@ type PriceUpdate struct {
 }
 
 type SubscribeMessage struct {
-	Symbol string `json:"symbol"`
-	Client *Client
+	Symbol   string `json:"symbol"`
+	ClientId string `json:"client_id"`
 }
 
 type UnsubscribeMessage struct {
-	Symbol string `json:"symbol"`
-	Client *Client
+	Symbol   string `json:"symbol"`
+	ClientId string `json:"client_id"`
 }
