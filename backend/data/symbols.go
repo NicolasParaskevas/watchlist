@@ -7,9 +7,10 @@ import (
 )
 
 type Symbol struct {
-	Symbol string `json:"symbol"`
-	Type   string `json:"type"`
-	Name   string `json:"name"`
+	Symbol string  `json:"symbol"`
+	Type   string  `json:"type"`
+	Name   string  `json:"name"`
+	Price  float64 `json:"-"`
 }
 
 var cached []Symbol
