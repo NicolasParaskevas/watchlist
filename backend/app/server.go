@@ -66,7 +66,7 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	client := &Client{
 		Conn:           conn,
 		Send:           make(chan []byte, 256),
-		WatchedSymbols: make(map[string]bool),
+		WatchedSymbols: make(map[data.Symbol]bool),
 	}
 
 	s.Hub.Register <- client

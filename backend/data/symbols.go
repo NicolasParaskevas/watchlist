@@ -12,7 +12,18 @@ type Symbol struct {
 	Name   string `json:"name"`
 }
 
+var cached []Symbol
+
 func GetAllSymbols() ([]Symbol, error) {
+
+	// INFO
+	// Just using a variable for now to avoid reading
+	// from the datasource each call since the list won't be
+	// updated. This could be a REDIS cache in the future
+	if cached != nil {
+		return cached, nil
+	}
+
 	// TODO use DB later
 	data, err := os.ReadFile("data/symbols.json")
 	if err != nil {
@@ -25,6 +36,8 @@ func GetAllSymbols() ([]Symbol, error) {
 		log.Println(err)
 		return nil, err
 	}
+
+	cached = symbols
 
 	return symbols, nil
 }
