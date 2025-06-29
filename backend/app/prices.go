@@ -12,7 +12,7 @@ func GetPriceData(h *Hub) {
 	symbols, err := data.GetAllSymbols()
 
 	if err != nil {
-		log.Println("Error getting symbols")
+		log.Printf("Error getting symbols: %v", err)
 		return
 	}
 
