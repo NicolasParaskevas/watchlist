@@ -39,21 +39,7 @@ func (s *Server) Start(addr string) error {
 
 func (s *Server) routes() {
 	s.mux.HandleFunc("/ws", s.handleWebSocket)
-
-	s.mux.HandleFunc("/subscribe", s.methodPostHandler(s.handleSubscribe))
-	s.mux.HandleFunc("/unsubscribe", s.methodPostHandler(s.handleUnsubscribe))
-
 	s.mux.HandleFunc("/symbols-list", s.handleAllSymbols)
-}
-
-func (s *Server) methodPostHandler(next http.HandlerFunc) http.HandlerFunc {
-	return func(rw http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(rw, "Method Not Allowed", http.StatusMethodNotAllowed)
-			return
-		}
-		next(rw, r)
-	}
 }
 
 func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
@@ -68,21 +54,13 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	s.Hub.Register <- client
 
+	clientIdMsg := map[string]string{"clientId": client.Id}
+	msg, _ := json.Marshal(clientIdMsg)
+	client.Send <- msg
+
 	go s.writePump(client)
 	s.readPump(client)
 
-}
-
-func (s *Server) handleSubscribe(rw http.ResponseWriter, r *http.Request) {
-	// todo
-	// send the parse request messaage and send it to the hub subscribed channel
-	// to update the list
-}
-
-func (s *Server) handleUnsubscribe(rw http.ResponseWriter, r *http.Request) {
-	// todo
-	// send the parse request messaage and send it to the hub subscribed channel
-	// to update the list and remove symbol from viewing list
 }
 
 func (s *Server) handleAllSymbols(rw http.ResponseWriter, r *http.Request) {
@@ -115,7 +93,27 @@ func (s *Server) readPump(c *Client) {
 			break
 		}
 
-		log.Println("received from client:", string(msg))
+		var message ClientMessage
+		if err := json.Unmarshal(msg, &message); err != nil {
+			log.Println("Invalid message format:", err)
+			continue
+		}
+
+		switch message.Action {
+		case "subscribe":
+			s.Hub.Subscribe <- &SubscribeMessage{
+				ClientId: c.Id,
+				Symbol:   message.Symbol,
+			}
+		case "unsubscribe":
+			s.Hub.Unsubscribe <- &UnsubscribeMessage{
+				ClientId: c.Id,
+				Symbol:   message.Symbol,
+			}
+		default:
+			log.Println("Unknown action:", message.Action)
+		}
+
 	}
 }
 
