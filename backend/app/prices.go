@@ -8,7 +8,7 @@ import (
 	"github.com/nicolasparaskevas/watchlist/data"
 )
 
-func GetPriceData(h *Hub) {
+func GetPriceData(out chan<- PriceUpdate) {
 	symbols, err := data.GetAllSymbols()
 
 	if err != nil {
@@ -30,7 +30,7 @@ func GetPriceData(h *Hub) {
 			newPrice := generateRandomPrice(last)
 			prices[symbol.Symbol] = newPrice
 
-			h.BroadcastChan <- PriceUpdate{
+			out <- PriceUpdate{
 				Symbol: symbol,
 				Price:  newPrice,
 			}
