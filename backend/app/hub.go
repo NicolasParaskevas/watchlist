@@ -7,18 +7,22 @@ import (
 )
 
 type Hub struct {
-	Clients       map[*Client]bool
+	Clients       map[string]*Client
 	Register      chan *Client
 	Unregister    chan *Client
+	Subscribe     chan *SubscribeMessage
+	Unsubscribe   chan *UnsubscribeMessage
 	BroadcastChan chan PriceUpdate
 	Mutex         sync.Mutex
 }
 
 func NewHub() *Hub {
 	return &Hub{
-		Clients:       make(map[*Client]bool),
+		Clients:       make(map[string]*Client),
 		Register:      make(chan *Client),
 		Unregister:    make(chan *Client),
+		Subscribe:     make(chan *SubscribeMessage),
+		Unsubscribe:   make(chan *UnsubscribeMessage),
 		BroadcastChan: make(chan PriceUpdate),
 	}
 }
@@ -28,17 +32,27 @@ func (h *Hub) Run() {
 		select {
 		case client := <-h.Register:
 			h.Mutex.Lock()
-			h.Clients[client] = true
+			h.Clients[client.Id] = client
 			h.Mutex.Unlock()
 			log.Println("New client connected. Total clients:", len(h.Clients))
 
 		case client := <-h.Unregister:
 			h.Mutex.Lock()
-			if _, ok := h.Clients[client]; ok {
-				delete(h.Clients, client)
+			if _, ok := h.Clients[client.Id]; ok {
+				delete(h.Clients, client.Id)
 				close(client.Send)
 				log.Println("Client disconnected. Total clients:", len(h.Clients))
 			}
+			h.Mutex.Unlock()
+
+		case sub := <-h.Subscribe:
+			h.Mutex.Lock()
+			sub.Client.Subscribe(sub.Symbol)
+			h.Mutex.Unlock()
+
+		case unsub := <-h.Unsubscribe:
+			h.Mutex.Lock()
+			unsub.Client.Unsubscribe(unsub.Symbol)
 			h.Mutex.Unlock()
 
 		case update := <-h.BroadcastChan:
@@ -48,7 +62,7 @@ func (h *Hub) Run() {
 				continue
 			}
 			h.Mutex.Lock()
-			for client := range h.Clients {
+			for _, client := range h.Clients {
 				if client.IsWatching(update.Symbol) {
 					client.Send <- msg
 				}

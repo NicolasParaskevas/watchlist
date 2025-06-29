@@ -64,11 +64,7 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := &Client{
-		Conn:           conn,
-		Send:           make(chan []byte, 256),
-		WatchedSymbols: make(map[data.Symbol]bool),
-	}
+	client := NewClient(conn)
 
 	s.Hub.Register <- client
 
@@ -79,10 +75,14 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleSubscribe(rw http.ResponseWriter, r *http.Request) {
 	// todo
+	// send the parse request messaage and send it to the hub subscribed channel
+	// to update the list
 }
 
 func (s *Server) handleUnsubscribe(rw http.ResponseWriter, r *http.Request) {
 	// todo
+	// send the parse request messaage and send it to the hub subscribed channel
+	// to update the list and remove symbol from viewing list
 }
 
 func (s *Server) handleAllSymbols(rw http.ResponseWriter, r *http.Request) {
@@ -114,8 +114,6 @@ func (s *Server) readPump(c *Client) {
 			log.Println("read error:", err)
 			break
 		}
-
-		// TODO update subscribe list
 
 		log.Println("received from client:", string(msg))
 	}
