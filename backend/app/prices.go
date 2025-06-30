@@ -31,7 +31,7 @@ func GetPriceData(out chan<- PriceUpdate) {
 			prices[symbol.Symbol] = newPrice
 
 			out <- PriceUpdate{
-				Symbol: symbol,
+				Symbol: symbol.Symbol,
 				Price:  newPrice,
 			}
 		}

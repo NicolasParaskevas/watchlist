@@ -6,7 +6,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
-	"github.com/nicolasparaskevas/watchlist/data"
 )
 
 type Client struct {
@@ -32,10 +31,10 @@ func NewClient(conn *websocket.Conn) *Client {
 	}
 }
 
-func (c *Client) IsWatching(symbol data.Symbol) bool {
+func (c *Client) IsWatching(symbol string) bool {
 	c.Mutex.RLock()
 	defer c.Mutex.RUnlock()
-	return c.WatchedSymbols[symbol.Symbol]
+	return c.WatchedSymbols[symbol]
 }
 
 func (c *Client) Subscribe(symbol string) {
