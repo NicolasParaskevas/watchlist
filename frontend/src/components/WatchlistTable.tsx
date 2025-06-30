@@ -20,7 +20,7 @@ const WatchlistTable: React.FC<Props> = ({ symbols, prices, onRemove }) => {
         {symbols.map(symbol => (
           <tr key={symbol}>
             <td>{symbol}</td>
-            <td>{prices[symbol] || "..."}</td>
+            <td>{prices[symbol] ?? "..."}</td>
             <td>
               <button onClick={() => onRemove(symbol)}>Remove</button>
             </td>

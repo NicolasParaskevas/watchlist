@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { connectWS, sendMessage } from "./websocket";
-import {  PriceUpdate } from "./types";
+import { PriceUpdate, SymbolEntry } from "./types";
 import SymbolModal from "./components/SymbolModal";
 import WatchlistTable from "./components/WatchlistTable";
 
@@ -8,10 +9,17 @@ function App() {
   const [watchlist, setWatchlist] = useState<string[]>([]);
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [showModal, setShowModal] = useState(false);
+  const [symbols, setSymbols] = useState<SymbolEntry[]>([]);
 
   useEffect(() => {
     connectWS((update: PriceUpdate) => {
       setPrices(prev => ({ ...prev, [update.symbol]: update.price }));
+    });
+  }, []);
+
+  useEffect(() => {
+    axios.get("http://localhost:8080/symbols-list").then(res => {
+      setSymbols(res.data);
     });
   }, []);
 
@@ -39,7 +47,13 @@ function App() {
         prices={prices}
         onRemove={unsubscribe}
       />
-      {showModal && <SymbolModal onClose={() => setShowModal(false)} onAdd={subscribe} />}
+      {showModal && (
+        <SymbolModal
+          onClose={() => setShowModal(false)}
+          onAdd={subscribe}
+          symbols={symbols}
+        />
+      )}
     </div>
   );
 }

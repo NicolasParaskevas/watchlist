@@ -5,17 +5,10 @@ import { SymbolEntry } from "../types";
 interface Props {
   onClose: () => void;
   onAdd: (symbol: string) => void;
+  symbols: SymbolEntry[];
 }
 
-const SymbolModal: React.FC<Props> = ({ onClose, onAdd }) => {
-  const [symbols, setSymbols] = useState<SymbolEntry[]>([]);
-
-  useEffect(() => {
-    axios.get("http://localhost:8080/symbols-list").then(res => {
-      setSymbols(res.data);
-    });
-  }, []);
-
+const SymbolModal: React.FC<Props> = ({ onClose, onAdd, symbols }) => {
   return (
     <div className="modal">
       <h2>Select a symbol</h2>
