@@ -17,7 +17,7 @@ type Server struct {
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		origin := r.Header.Get("Origin")
-		return origin == "http://127.0.0.1:8080"
+		return origin == "http://localhost:3000"
 	},
 }
 
@@ -40,7 +40,7 @@ func (s *Server) Start(addr string) error {
 
 func (s *Server) routes() {
 	s.mux.HandleFunc("/ws", s.handleWebSocket)
-	s.mux.HandleFunc("/symbols-list", s.handleAllSymbols)
+	s.mux.HandleFunc("/symbols-list", withCORS(s.handleAllSymbols))
 }
 
 func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
@@ -83,8 +83,9 @@ func writeJSON(rw http.ResponseWriter, v any) {
 
 func (s *Server) readPump(c *Client) {
 	defer func() {
-		s.Hub.Register <- c
+		s.Hub.Unregister <- c
 		c.Conn.Close()
+		log.Printf("Client %s disconnected\n", c.Id)
 	}()
 
 	for {
