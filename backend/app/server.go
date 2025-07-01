@@ -102,14 +102,10 @@ func (s *Server) readPump(c *Client) {
 		}
 
 		switch message.Action {
-		case "subscribe":
-			s.Hub.Subscribe <- &SubscribeMessage{
-				ClientId: c.Id,
-				Symbol:   message.Symbol,
-			}
-		case "unsubscribe":
-			s.Hub.Unsubscribe <- &UnsubscribeMessage{
-				ClientId: c.Id,
+		case "subscribe", "unsubscribe":
+			s.Hub.ClientAction <- &ClientMessage{
+				Action:   message.Action,
+				ClientID: c.Id,
 				Symbol:   message.Symbol,
 			}
 		default:

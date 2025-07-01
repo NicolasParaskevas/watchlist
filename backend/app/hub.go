@@ -10,8 +10,7 @@ type Hub struct {
 	Clients       map[string]*Client
 	Register      chan *Client
 	Unregister    chan *Client
-	Subscribe     chan *SubscribeMessage
-	Unsubscribe   chan *UnsubscribeMessage
+	ClientAction  chan *ClientMessage
 	BroadcastChan chan PriceUpdate
 	Mutex         sync.Mutex
 }
@@ -21,8 +20,7 @@ func NewHub() *Hub {
 		Clients:       make(map[string]*Client),
 		Register:      make(chan *Client),
 		Unregister:    make(chan *Client),
-		Subscribe:     make(chan *SubscribeMessage),
-		Unsubscribe:   make(chan *UnsubscribeMessage),
+		ClientAction:  make(chan *ClientMessage),
 		BroadcastChan: make(chan PriceUpdate),
 	}
 }
@@ -45,20 +43,22 @@ func (h *Hub) Run() {
 			}
 			h.Mutex.Unlock()
 
-		case sub := <-h.Subscribe:
+		case action := <-h.ClientAction:
 			h.Mutex.Lock()
-			client, ok := h.Clients[sub.ClientId]
-			if ok {
-				client.Subscribe(sub.Symbol)
-			}
-			h.Mutex.Unlock()
+			client, ok := h.Clients[action.ClientID]
 
-		case unsub := <-h.Unsubscribe:
-			h.Mutex.Lock()
-			client, ok := h.Clients[unsub.ClientId]
-			if ok {
-				client.Unsubscribe(unsub.Symbol)
+			if !ok {
+				h.Mutex.Unlock()
+				continue
 			}
+
+			switch action.Action {
+			case "subscribe":
+				client.Subscribe(action.Symbol)
+			case "unsubscribe":
+				client.Unsubscribe(action.Symbol)
+			}
+
 			h.Mutex.Unlock()
 
 		case update := <-h.BroadcastChan:
