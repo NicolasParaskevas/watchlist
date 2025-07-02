@@ -17,6 +17,7 @@ make
 
 For the frontend:
 ```
+cd frontend
 npm install
 npm start
 ```
