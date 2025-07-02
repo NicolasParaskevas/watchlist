@@ -3,7 +3,7 @@ import { SymbolEntry } from "../types";
 
 interface Props {
   onClose: () => void;
-  onAdd: (symbol: string) => void;
+  onAdd: (symbol: SymbolEntry) => void;
   symbols: SymbolEntry[];
 }
 
@@ -15,8 +15,8 @@ const SymbolModal: React.FC<Props> = ({ onClose, onAdd, symbols }) => {
         <ul>
           {symbols.map(s => (
             <li key={s.symbol}>
-              {s.symbol}
-              <button onClick={() => { onAdd(s.symbol); onClose(); }}>Add</button>
+              {s.symbol} - {s.name}
+              <button onClick={() => { onAdd(s); onClose(); }}>Add</button>
             </li>
           ))}
         </ul>

@@ -1,5 +1,6 @@
 export interface SymbolEntry {
   symbol: string;
+  name: string;
 }
 
 export interface PriceUpdate {

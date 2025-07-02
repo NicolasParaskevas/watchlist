@@ -6,7 +6,7 @@ import SymbolModal from "./components/SymbolModal";
 import WatchlistTable from "./components/WatchlistTable";
 
 function App() {
-  const [watchlist, setWatchlist] = useState<string[]>([]);
+  const [watchlist, setWatchlist] = useState<SymbolEntry[]>([]);
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [showModal, setShowModal] = useState(false);
   const [symbols, setSymbols] = useState<SymbolEntry[]>([]);
@@ -23,14 +23,14 @@ function App() {
     });
   }, []);
 
-  const subscribe = (symbol: string) => {
-    sendMessage({ action: "subscribe", symbol });
+  const subscribe = (symbol: SymbolEntry) => {
+    sendMessage({ action: "subscribe", symbol: symbol.symbol });
     setWatchlist(prev => [...new Set([...prev, symbol])]);
   };
 
   const unsubscribe = (symbol: string) => {
     sendMessage({ action: "unsubscribe", symbol });
-    setWatchlist(prev => prev.filter(s => s !== symbol));
+    setWatchlist(prev => prev.filter(s => s.symbol !== symbol));
     setPrices(prev => {
       const updated = { ...prev };
       delete updated[symbol];
@@ -41,7 +41,11 @@ function App() {
   return (
     <div>
       <h1>Watchlist</h1>
-      <button onClick={() => setShowModal(true)}>Add Symbol</button>
+
+      <div className="button-container">
+        <button onClick={() => setShowModal(true)}>Add Symbol</button>
+      </div>
+      
       <WatchlistTable
         symbols={watchlist}
         prices={prices}

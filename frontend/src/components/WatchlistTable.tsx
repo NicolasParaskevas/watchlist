@@ -1,7 +1,8 @@
 import React from "react";
+import { SymbolEntry } from "../types";
 
 interface Props {
-  symbols: string[];
+  symbols: SymbolEntry[];
   prices: Record<string, number>;
   onRemove: (symbol: string) => void;
 }
@@ -12,17 +13,19 @@ const WatchlistTable: React.FC<Props> = ({ symbols, prices, onRemove }) => {
       <thead>
         <tr>
           <th>Symbol</th>
+          <th>Name</th>
           <th>Price</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         {symbols.map(symbol => (
-          <tr key={symbol}>
-            <td>{symbol}</td>
-            <td>{prices[symbol] ?? "..."}</td>
+          <tr key={symbol.symbol}>
+            <td>{symbol.symbol}</td>
+            <td>{symbol.name}</td>
+            <td>{prices[symbol.symbol] ?? "..."}</td>
             <td>
-              <button onClick={() => onRemove(symbol)}>Remove</button>
+              <button onClick={() => onRemove(symbol.symbol)}>Remove</button>
             </td>
           </tr>
         ))}
