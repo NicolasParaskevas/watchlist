@@ -10,8 +10,9 @@ import (
 )
 
 type Server struct {
-	mux *http.ServeMux
-	Hub *Hub
+	mux        *http.ServeMux
+	Hub        *Hub
+	Repository data.SymbolRepository
 }
 
 var upgrader = websocket.Upgrader{
@@ -21,11 +22,12 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func NewServer(hub *Hub) *Server {
+func NewServer(hub *Hub, repo data.SymbolRepository) *Server {
 	m := http.NewServeMux()
 	s := &Server{
-		mux: m,
-		Hub: hub,
+		mux:        m,
+		Hub:        hub,
+		Repository: repo,
 	}
 	s.routes()
 	return s
@@ -33,7 +35,7 @@ func NewServer(hub *Hub) *Server {
 
 func (s *Server) Start(addr string) error {
 	go s.Hub.Run()
-	go GetPriceData(s.Hub.BroadcastChan)
+	go GetPriceData(s.Hub.BroadcastChan, s.Repository)
 	log.Println("Server starting at", addr)
 	return http.ListenAndServe(addr, s.mux)
 }
@@ -65,7 +67,7 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleAllSymbols(rw http.ResponseWriter, r *http.Request) {
-	symbols, err := data.GetAllSymbols()
+	symbols, err := s.Repository.GetAllSymbols()
 	if err != nil {
 		http.Error(rw, "Failed to load symbols", http.StatusInternalServerError)
 		return

@@ -8,8 +8,8 @@ import (
 	"github.com/nicolasparaskevas/watchlist/data"
 )
 
-func GetPriceData(out chan<- PriceUpdate) {
-	symbols, err := data.GetAllSymbols()
+func GetPriceData(out chan<- PriceUpdate, repo data.SymbolRepository) {
+	symbols, err := repo.GetAllSymbols()
 
 	if err != nil {
 		log.Printf("Error getting symbols: %v", err)
