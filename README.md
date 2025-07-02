@@ -13,6 +13,7 @@ For the backend:
 ```
 cd backend
 make
+./bin/watchlist
 ```
 
 For the frontend:
